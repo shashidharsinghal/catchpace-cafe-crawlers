@@ -94,5 +94,5 @@ AUTOTHROTTLE_ENABLED = True
 #FEED_URI="file:///Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdcafescrapper/page1.csv"
 
 #Mongo settings
-MONGO_URI="127.0.0.1:27017"
-MONGO_DATABASE="cafe"
+MONGO_URI="mongodb+srv://catchpace:O01e2imlupSb8FQF@catchpace-db-mggdr.mongodb.net"
+MONGO_DATABASE="library"

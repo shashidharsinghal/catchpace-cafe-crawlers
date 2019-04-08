@@ -82,4 +82,8 @@ class CafeItem(scrapy.Item):
     )
 
     dtlsdocid = scrapy.Field()
-
+    modesofpayment = scrapy.Field()
+    yearEst = scrapy.Field(
+        input_processor = MapCompose(str.strip),
+        output_processor = TakeFirst()
+    )

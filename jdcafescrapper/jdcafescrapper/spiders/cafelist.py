@@ -12,7 +12,10 @@ class CafelistSpider(scrapy.Spider):
     #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdcafescrapper/listing/cafelist.json'
     #}
     #allowed_domains = ['justdial.com']
-    start_urls = ['https://www.justdial.com/Gurgaon/Coffee-Shops-in-Gurgaon/nct-10104727/page-1']
+    #cafe
+    #start_urls = ['https://www.justdial.com/Gurgaon/Coffee-Shops-in-Gurgaon/nct-10104727/page-1']
+    #Library
+    start_urls = ["https://www.justdial.com/Delhi/Libraries-in-Gurgaon/nct-10299414/page-1"]
     firstelement = True
 
     def parse(self, response):

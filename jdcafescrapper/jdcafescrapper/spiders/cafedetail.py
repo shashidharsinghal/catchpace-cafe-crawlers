@@ -27,6 +27,7 @@ class CafedetailSpider(scrapy.Spider):
         cafeDetailSel = response.selector.xpath("//div[@id='setbackfix']")
         logging.info("Starting Detail Page Scrapping")
         openhours = []
+        modesofpayment = []
         cafeitemloader = ItemLoader( item = CafeItem(), selector=cafeDetailSel, response=response)
         #Website Link
         cafeitemloader.add_xpath('website',"//div[contains(@class,'dtpage')]/div/div/ul/li/span/a[@rel='nofollow']/text()")
@@ -39,8 +40,23 @@ class CafedetailSpider(scrapy.Spider):
         #Opening hours of cafe
         openhours = self.parse_openhours(response)
         cafeitemloader.add_value('openhours',openhours)
+       
+        for quickInfoSel in response.selector.xpath("//body//div[contains(@class,'mreinfwpr')]"):
+            logging.info(quickInfoSel)
+            logging.info(quickInfoSel.xpath(".//p/text()"))
+            #Modes of payment
+            if quickInfoSel.xpath(".//p/text()").extract_first() is not None:
+                if 'Payment' in quickInfoSel.xpath(".//p/text()").extract_first():
+                    for mop in quickInfoSel.xpath(".//ul[@class='alstdul']/li/span[@class='lng_mdpay']/text()").extract():
+                        modesofpayment.append(mop)
+                    cafeitemloader.add_value('modesofpayment',modesofpayment)
+                #Year of Establishment
+                if 'Established' in quickInfoSel.xpath(".//p/text()").extract_first():
+                     yearEst = str(quickInfoSel.xpath(".//ul[@class='alstdul']/li/text()").extract_first())
+                     if type(yearEst) == str :
+                        cafeitemloader.add_value('yearEst',yearEst)                  
         yield cafeitemloader.load_item()
-    
+
     #Method to parse opening days and time of cafe.
     def parse_openhours(self,response):
         openhours = []
