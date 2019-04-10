@@ -41,7 +41,7 @@ def fetchDocIds(value):
     return value
     
 
-class CafeItem(scrapy.Item):
+class JDItem(scrapy.Item):
     # define the fields for your item here like:
     name = scrapy.Field(
         input_processor = MapCompose(str.strip),

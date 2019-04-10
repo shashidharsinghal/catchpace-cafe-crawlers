@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for jdcafescrapper project
+# Scrapy settings for jdscrapper project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'jdcafescrapper'
+BOT_NAME = 'jdscrapper'
 
-SPIDER_MODULES = ['jdcafescrapper.spiders']
-NEWSPIDER_MODULE = 'jdcafescrapper.spiders'
+SPIDER_MODULES = ['jdscrapper.spiders']
+NEWSPIDER_MODULE = 'jdscrapper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'jdcafescrapper (+http://www.yourdomain.com)'
+#USER_AGENT = 'jdscrapper (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -47,16 +47,16 @@ DOWNLOAD_DELAY = 5
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'jdcafescrapper.middlewares.JdcafescrapperSpiderMiddleware': 543,
+#    'jsdcrapper.middlewares.JdscrapperSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None,
-    'jdcafescrapper.middlewares.UserAgentRotatorMiddleware': 400,
+    'jdscrapper.middlewares.UserAgentRotatorMiddleware': 400,
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    'jdcafescrapper.middlewares.JDCafeRetryMiddleware': 500,
+    'jdscrapper.middlewares.JDRetryMiddleware': 500,
 }
 
 # Enable or disable extensions
@@ -68,7 +68,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'jdcafescrapper.pipelines.CafeMongoPipeline': 300,
+    'jdscrapper.pipelines.JDMongoPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -91,8 +91,20 @@ AUTOTHROTTLE_ENABLED = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-#FEED_URI="file:///Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdcafescrapper/page1.csv"
+#FEED_URI="file:///Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdscrapper/page1.csv"
 
 #Mongo settings
 MONGO_URI="mongodb+srv://catchpace:O01e2imlupSb8FQF@catchpace-db-mggdr.mongodb.net"
-MONGO_DATABASE="library"
+MONGO_DATABASE="jddata"
+JD_ERROR_URL_COL="error_url"
+
+#Cafe settings
+INIT_REQ_URL="https://www.justdial.com/Gurgaon/Coffee-Shops-in-Gurgaon/nct-10104727/page-1"
+DETAIL_DATA_COL="jd_details_cafe"
+DETAIL_URL_STATUS_COL="jd_details_url_cafe"
+
+
+#Library settings
+#INIT_REQ_URL="https://www.justdial.com/Delhi/Libraries-in-Gurgaon/nct-10299414/page-1"
+#DETAIL_DATA_COL="jd_details_lib"
+#DETAIL_URL_COL="jd_details_url_lib"

@@ -1,35 +1,38 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.loader import ItemLoader
-from jdcafescrapper.items import CafeItem
+from jdscrapper.items import JDItem
 import logging
 
-class CafelistSpider(scrapy.Spider):
+class JDlistSpider(scrapy.Spider):
     #Identity
-    name = 'cafelist'
+    name = 'jdlist'
     retry_xpath = "//li[@class='cntanr']"
     #custom_settings = {
-    #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdcafescrapper/listing/cafelist.json'
+    #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdscrapper/listing/jdlist.json'
     #}
     #allowed_domains = ['justdial.com']
-    #cafe
-    #start_urls = ['https://www.justdial.com/Gurgaon/Coffee-Shops-in-Gurgaon/nct-10104727/page-1']
-    #Library
-    start_urls = ["https://www.justdial.com/Delhi/Libraries-in-Gurgaon/nct-10299414/page-1"]
     firstelement = True
 
+    @classmethod
+    def from_crawler(self, crawler, *args, **kwargs):
+        logging.info("Inside Class Method")
+        spider = super().from_crawler(crawler, *args, **kwargs)
+        spider.start_urls.append(crawler.settings.get('INIT_REQ_URL'))
+        return spider
+
     def parse(self, response):
-        for cafe in response.selector.xpath("//li[@class='cntanr']"):
-            loader = ItemLoader( item = CafeItem(), selector = cafe, response = response )
-            #Name of the Cafe
+        for jd in response.selector.xpath("//li[@class='cntanr']"):
+            loader = ItemLoader( item = JDItem(), selector = jd, response = response )
+            #Name of the jd
             loader.add_xpath('name',".//section/div/section[@class='jcar']/div/h2/span/a/span/text()[1]")
-            #Address of the Cafe
+            #Address of the jd
             loader.add_xpath('addr',".//section/div/section[@class='jcar']/div/p[3]/span/a/span[2]/span[@class='cont_fl_addr']/text()[1]")
             #Reviews count 
             #loader.add_xpath('revCount',".//section/div/section[@class='jcar']/div/p[1]/a/span[@class='rt_count lng_vote']/text()[1]")
             #Detail page link
             loader.add_xpath('detailPgLnk',".//span[@class='jcn']/a/@href")
-            #Doc ID of cafe as per JD
+            #Doc ID of jd as per JD
             loader.add_xpath('docId',".//span[@class='jcn']/a/@onclick")
             #PhoneNumber
             if self.firstelement:

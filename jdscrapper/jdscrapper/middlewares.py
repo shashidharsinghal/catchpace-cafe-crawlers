@@ -11,6 +11,8 @@ from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
 from scrapy.http import headers
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
 from scrapy.utils.response import response_status_message
+import pymongo
+import logging
 
 class UserAgentRotatorMiddleware(UserAgentMiddleware):
 
@@ -83,7 +85,7 @@ class UserAgentRotatorMiddleware(UserAgentMiddleware):
 
 
 
-class JdcafescrapperSpiderMiddleware(object):
+class JdscrapperSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
     # passed objects.
@@ -131,7 +133,7 @@ class JdcafescrapperSpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
-class JdcafescrapperDownloaderMiddleware(object):
+class JdscrapperDownloaderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
@@ -178,7 +180,7 @@ class JdcafescrapperDownloaderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
-class JDCafeRetryMiddleware(RetryMiddleware):
+class JDRetryMiddleware(RetryMiddleware):
 
     def process_response(self, request, response, spider):
         if request.meta.get('dont_retry', False):
@@ -186,8 +188,9 @@ class JDCafeRetryMiddleware(RetryMiddleware):
         if response.status in self.retry_http_codes:
             reason = response_status_message(response.status)
             return self._retry(request, reason, spider) or response
-
-        # this is your check
+        
+        # continue
         if 'robots' not in request.url and len(response.xpath(spider.retry_xpath))==0:
             return self._retry(request, 'response got xpath "{}"'.format(spider.retry_xpath), spider) or response
+        
         return response

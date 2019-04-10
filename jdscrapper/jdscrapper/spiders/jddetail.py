@@ -2,17 +2,17 @@
 import scrapy
 import logging
 from scrapy.loader import ItemLoader
-from jdcafescrapper.items import CafeItem
+from jdscrapper.items import JDItem
 import pymongo
 
-class CafedetailSpider(scrapy.Spider):
-    name = 'cafedetail'
-    _cafe_url_collection = 'cafe_details_url'
+class JDdetailSpider(scrapy.Spider):
+    name = 'jddetail'
+    _jd_url_collection = 'jd_details_url'
     retry_xpath = "//div[@id='setbackfix']"
     #allowed_domains = ['justdial.com']
     start_urls = []
     #custom_settings = {
-    #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdcafescrapper/detail/cafedetail.json'
+    #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdscrapper/detail/jddetail.json'
     #}
 
     @classmethod
@@ -24,22 +24,22 @@ class CafedetailSpider(scrapy.Spider):
 
 
     def parse(self, response):
-        cafeDetailSel = response.selector.xpath("//div[@id='setbackfix']")
+        jdDetailSel = response.selector.xpath("//div[@id='setbackfix']")
         logging.info("Starting Detail Page Scrapping")
         openhours = []
         modesofpayment = []
-        cafeitemloader = ItemLoader( item = CafeItem(), selector=cafeDetailSel, response=response)
+        jditemloader = ItemLoader( item = JDItem(), selector=jdDetailSel, response=response)
         #Website Link
-        cafeitemloader.add_xpath('website',"//div[contains(@class,'dtpage')]/div/div/ul/li/span/a[@rel='nofollow']/text()")
+        jditemloader.add_xpath('website',"//div[contains(@class,'dtpage')]/div/div/ul/li/span/a[@rel='nofollow']/text()")
         #Average rating
-        cafeitemloader.add_xpath('avgRating',"//div[@class='company-details']/div/div/div/span/span[@class='rating']/span/span[@class='value-titles']/text()")
+        jditemloader.add_xpath('avgRating',"//div[@class='company-details']/div/div/div/span/span[@class='rating']/span/span[@class='value-titles']/text()")
         #Total Reviews
-        cafeitemloader.add_xpath('totreviews',"//div[@class='company-details']/div/div/div/span/span/span[@class='votes']/text()")
-        #doc Id of cafe as per JD
-        cafeitemloader.add_xpath('docId',"//form/input[@id='docid']/@value[1]")
-        #Opening hours of cafe
+        jditemloader.add_xpath('totreviews',"//div[@class='company-details']/div/div/div/span/span/span[@class='votes']/text()")
+        #doc Id of jd as per JD
+        jditemloader.add_xpath('docId',"//form/input[@id='docid']/@value[1]")
+        #Opening hours of jd
         openhours = self.parse_openhours(response)
-        cafeitemloader.add_value('openhours',openhours)
+        jditemloader.add_value('openhours',openhours)
        
         for quickInfoSel in response.selector.xpath("//body//div[contains(@class,'mreinfwpr')]"):
             logging.info(quickInfoSel)
@@ -49,15 +49,15 @@ class CafedetailSpider(scrapy.Spider):
                 if 'Payment' in quickInfoSel.xpath(".//p/text()").extract_first():
                     for mop in quickInfoSel.xpath(".//ul[@class='alstdul']/li/span[@class='lng_mdpay']/text()").extract():
                         modesofpayment.append(mop)
-                    cafeitemloader.add_value('modesofpayment',modesofpayment)
+                    jditemloader.add_value('modesofpayment',modesofpayment)
                 #Year of Establishment
                 if 'Established' in quickInfoSel.xpath(".//p/text()").extract_first():
                      yearEst = str(quickInfoSel.xpath(".//ul[@class='alstdul']/li/text()").extract_first())
                      if type(yearEst) == str :
-                        cafeitemloader.add_value('yearEst',yearEst)                  
-        yield cafeitemloader.load_item()
+                        jditemloader.add_value('yearEst',yearEst)                  
+        yield jditemloader.load_item()
 
-    #Method to parse opening days and time of cafe.
+    #Method to parse opening days and time of jd.
     def parse_openhours(self,response):
         openhours = []
         for openHr in response.selector.xpath("//div[contains(@class,'dtpage')]/div/div/ul[@id='statHr']/li"):
@@ -78,7 +78,8 @@ class CafedetailSpider(scrapy.Spider):
         logging.info("Fetching urls from Mongo DB")
         self.client = pymongo.MongoClient(crawler.settings.get('MONGO_URI'))
         self.db = self.client[crawler.settings.get('MONGO_DATABASE')]
-        for url in self.db[self._cafe_url_collection].find({"status":False},{"url":1,"_id":0}):
+        url_collection = crawler.settings.get('DETAIL_URL_STATUS_COL')
+        for url in self.db[url_collection].find({"status":False},{"url":1,"_id":0}):
             logging.info(url["url"][0])
             start_urls.append(url["url"][0])
         logging.info(self.start_urls)
