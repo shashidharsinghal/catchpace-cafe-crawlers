@@ -17,7 +17,6 @@ class JDdetailSpider(scrapy.Spider):
 
     @classmethod
     def from_crawler(self, crawler, *args, **kwargs):
-        logging.info("Inside Class Method")
         spider = super().from_crawler(crawler, *args, **kwargs)
         spider.start_urls = self.get_urls_from_mongo(self,crawler)
         return spider
@@ -25,7 +24,6 @@ class JDdetailSpider(scrapy.Spider):
 
     def parse(self, response):
         jdDetailSel = response.selector.xpath("//div[@id='setbackfix']")
-        logging.info("Starting Detail Page Scrapping")
         openhours = []
         modesofpayment = []
         jditemloader = ItemLoader( item = JDItem(), selector=jdDetailSel, response=response)
@@ -42,8 +40,6 @@ class JDdetailSpider(scrapy.Spider):
         jditemloader.add_value('openhours',openhours)
        
         for quickInfoSel in response.selector.xpath("//body//div[contains(@class,'mreinfwpr')]"):
-            logging.info(quickInfoSel)
-            logging.info(quickInfoSel.xpath(".//p/text()"))
             #Modes of payment
             if quickInfoSel.xpath(".//p/text()").extract_first() is not None:
                 if 'Payment' in quickInfoSel.xpath(".//p/text()").extract_first():
@@ -75,12 +71,10 @@ class JDdetailSpider(scrapy.Spider):
     def get_urls_from_mongo(self,crawler):
         #Get Mongo connection
         start_urls = []
-        logging.info("Fetching urls from Mongo DB")
         self.client = pymongo.MongoClient(crawler.settings.get('MONGO_URI'))
         self.db = self.client[crawler.settings.get('MONGO_DATABASE')]
         url_collection = crawler.settings.get('DETAIL_URL_STATUS_COL')
         for url in self.db[url_collection].find({"status":False},{"url":1,"_id":0}):
-            logging.info(url["url"][0])
             start_urls.append(url["url"][0])
         logging.info(self.start_urls)
         self.client.close()

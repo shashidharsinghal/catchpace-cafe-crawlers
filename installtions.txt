@@ -1,0 +1,19 @@
+#Run the below command in ubuntu
+sudo apt-get update; sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+#Install Git
+yum install git-all
+#Install pyenv
+curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+#Set the penv path
+open ~/.bashrc and paste the path
+#install python version
+pyenv install 3.6.5
+#Point the current version of python in pyenv settings
+create a file in ~/.penv/version and write 3.6.5 and save
+# create virtual enviornment
+virtual_env virtual_workspace
+#Activate virtual workspace
+source bin/activate
+#install scrapy
+pip install scrapy==1.5.1
+

@@ -6,7 +6,6 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 import pymongo
-import logging
 
 class JdscrapperPipeline(object):
     def process_item(self, item, spider):
@@ -46,7 +45,6 @@ class JDMongoPipeline:
     def process_jd_list(self,item):
         #Verify if the item is already present.
         doc = self.db[self.jd_data_collection].find_one({"docId":item['docId']})
-        logging.info(doc)
         if  doc is None:
             #Save JD status doc in Mongo
             statusdoc = {"url":item['detailPgLnk'],"status":False,"docId":item['docId']}
@@ -65,7 +63,6 @@ class JDMongoPipeline:
         #Update jd Details in doc
         docId = item['docId']
         oldDoc = self.db[self.jd_data_collection].find({"docId":docId})[0]
-        logging.info(oldDoc)
         newDoc = { "$set": dict(item) }
         self.db[self.jd_data_collection].update_one(oldDoc,newDoc)
         statusdoc = self.db[self.jd_data_url_collection].find({"docId":docId})[0]

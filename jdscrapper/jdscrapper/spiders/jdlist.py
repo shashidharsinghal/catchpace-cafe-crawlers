@@ -16,7 +16,6 @@ class JDlistSpider(scrapy.Spider):
 
     @classmethod
     def from_crawler(self, crawler, *args, **kwargs):
-        logging.info("Inside Class Method")
         spider = super().from_crawler(crawler, *args, **kwargs)
         spider.start_urls.append(crawler.settings.get('INIT_REQ_URL'))
         return spider

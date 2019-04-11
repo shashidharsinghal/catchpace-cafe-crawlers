@@ -35,7 +35,6 @@ def mapIconToDigit(value):
     return iconToDigitMapping.get(icon,"none")
 
 def fetchDocIds(value):
-    logging.info(value)
     value = value.split(',')
     value = value[len(value)-1].replace(u"'","").replace(u")","").replace(u";","")
     return value
