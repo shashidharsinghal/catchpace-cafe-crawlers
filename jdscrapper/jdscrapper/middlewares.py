@@ -194,3 +194,35 @@ class JDRetryMiddleware(RetryMiddleware):
             return self._retry(request, 'response got xpath "{}"'.format(spider.retry_xpath), spider) or response
         
         return response
+
+from stem import Signal
+from stem.control import Controller
+from toripchanger import TorIpChanger
+
+# A Tor IP will be reused only after 10 different IPs were used.
+#ip_changer = TorIpChanger(tor_password='shashitor',tor_port='9051',local_http_proxy='http://127.0.0.1:8118')
+
+
+
+def _set_new_ip():
+      with Controller.from_port(port=9051) as controller:
+        controller.authenticate(password='shashitor')
+        controller.signal(Signal.NEWNYM)
+
+class ProxyMiddleware(object):
+    #_req_count=0
+    #ip_changer.get_new_ip()
+
+    #def _set_new_ip():
+     # with Controller.from_port(port=9051) as controller:
+      #  controller.authenticate(password='shashitor')
+       # controller.signal(Signal.NEWNYM)
+
+    def process_request(self, request, spider):
+        #self._req_count +=1
+        #if self._req_count > 10:
+        #    self._req_count=0
+        #    ip_changer.get_new_ip()
+        _set_new_ip()
+        request.meta['proxy'] = 'http://127.0.0.1:8118'
+        spider.log('Proxy : %s' % request.meta['proxy'])
