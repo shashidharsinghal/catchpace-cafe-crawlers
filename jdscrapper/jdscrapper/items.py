@@ -38,7 +38,6 @@ def fetchDocIds(value):
     value = value.split(',')
     value = value[len(value)-1].replace(u"'","").replace(u")","").replace(u";","")
     return value
-    
 
 class JDItem(scrapy.Item):
     # define the fields for your item here like:

@@ -3,6 +3,7 @@ import scrapy
 import logging
 from scrapy.loader import ItemLoader
 from jdscrapper.items import JDItem
+from scrapy.http.request import Request
 import pymongo
 
 class JDdetailSpider(scrapy.Spider):
@@ -10,7 +11,7 @@ class JDdetailSpider(scrapy.Spider):
     _jd_url_collection = 'jd_details_url'
     retry_xpath = "//div[@id='setbackfix']"
     #allowed_domains = ['justdial.com']
-    start_urls = []
+    req_urls = []
     #custom_settings = {
     #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdscrapper/detail/jddetail.json'
     #}
@@ -18,9 +19,17 @@ class JDdetailSpider(scrapy.Spider):
     @classmethod
     def from_crawler(self, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
-        spider.start_urls = self.get_urls_from_mongo(self,crawler)
+        self.req_urls = self.get_urls_from_mongo(self,crawler)
         return spider
 
+    def start_requests(self):
+        for url in self.req_urls:
+             yield Request(url,
+                  meta = {
+                      'dont_redirect': True,
+                      'handle_httpstatus_list': [302]
+                  },
+                  callback= self.parse)
 
     def parse(self, response):
         jdDetailSel = response.selector.xpath("//div[@id='setbackfix']")

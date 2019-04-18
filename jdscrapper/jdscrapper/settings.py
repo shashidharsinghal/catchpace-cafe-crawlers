@@ -22,12 +22,13 @@ NEWSPIDER_MODULE = 'jdscrapper.spiders'
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 5
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 10
+DOWNLOAD_DELAY = 5
+RETRY_TIMES = 50
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -71,9 +72,8 @@ DOWNLOADER_MIDDLEWARES = {
 ROTATING_PROXY_LIST_PATH = '/root/virtual_env/catchpace-cafe-crawlers/jdscrapper/freeproxylist.txt'
 
 #ROTATING_PROXY_LIST = [
-#        '207.182.135.123:8118',
-#        '43.252.10.189:8080'
-#        ]
+ #       '185.130.144.241:3004'
+  #      ]
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -115,12 +115,34 @@ MONGO_DATABASE="jddata"
 JD_ERROR_URL_COL="error_url"
 
 #Cafe settings
-INIT_REQ_URL="https://www.justdial.com/Gurgaon/Coffee-Shops-in-Gurgaon/nct-10104727/page-1"
-DETAIL_DATA_COL="jd_details_cafe"
-DETAIL_URL_STATUS_COL="jd_details_url_cafe"
+#INIT_REQ_URL="https://www.justdial.com/Gurgaon/Coffee-Shops-in-Gurgaon/nct-10104727/page-40"
+#DETAIL_DATA_COL="jd_details_cafe"
+#DETAIL_URL_STATUS_COL="jd_details_url_cafe"
 
 
 #Library settings
-#INIT_REQ_URL="https://www.justdial.com/Delhi/Libraries-in-Gurgaon/nct-10299414/page-1"
-#DETAIL_DATA_COL="jd_details_lib"
-#DETAIL_URL_COL="jd_details_url_lib"
+INIT_REQ_URL="https://www.justdial.com/Delhi/Libraries-in-Gurgaon/page-23"
+DETAIL_DATA_COL="jd_details_lib"
+DETAIL_URL_STATUS_COL="jd_details_url_lib"
+
+#Setting up logging properties
+import logging
+from logging.handlers import RotatingFileHandler
+
+from scrapy.utils.log import configure_logging
+
+LOG_ENABLED = False
+# Disable default Scrapy log settings.
+configure_logging(install_root_handler=False)
+
+# Define your logging settings.
+log_file = '/root/virtual_env/catchpace-cafe-crawlers/jdscrapper/jdlogs.log'
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+rotating_file_log = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=1)
+rotating_file_log.setLevel(logging.INFO)
+rotating_file_log.setFormatter(formatter)
+root_logger.addHandler(rotating_file_log)
+
