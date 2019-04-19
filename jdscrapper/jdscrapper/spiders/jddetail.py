@@ -85,7 +85,7 @@ class JDdetailSpider(scrapy.Spider):
         url_collection = crawler.settings.get('DETAIL_URL_STATUS_COL')
         for url in self.db[url_collection].find({"status":False},{"url":1,"_id":0}):
             start_urls.append(url["url"][0])
-        logging.info(self.start_urls)
+#        logging.info(self.req_urls)
         self.client.close()
         return start_urls
         

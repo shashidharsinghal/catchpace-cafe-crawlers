@@ -19,16 +19,18 @@ NEWSPIDER_MODULE = 'jdscrapper.spiders'
 #USER_AGENT = 'jdscrapper (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 1
+RETRY_HTTP_CODES = [301,302]
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 5
+DOWNLOAD_DELAY = 2
 RETRY_TIMES = 50
+ROTATING_PROXY_PAGE_RETRY_TIMES = 50
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -68,6 +70,7 @@ DOWNLOADER_MIDDLEWARES = {
     #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     #'jdscrapper.middlewares.ProxyMiddleware': 100
 }
+ROTATING_PROXY_BACKOFF_BASE = 30
 
 ROTATING_PROXY_LIST_PATH = '/root/virtual_env/catchpace-cafe-crawlers/jdscrapper/freeproxylist.txt'
 
@@ -121,7 +124,7 @@ JD_ERROR_URL_COL="error_url"
 
 
 #Library settings
-INIT_REQ_URL="https://www.justdial.com/Delhi/Libraries-in-Gurgaon/page-23"
+INIT_REQ_URL="https://www.justdial.com/Delhi/Libraries-in-Gurgaon/page-49"
 DETAIL_DATA_COL="jd_details_lib"
 DETAIL_URL_STATUS_COL="jd_details_url_lib"
 
@@ -131,15 +134,15 @@ from logging.handlers import RotatingFileHandler
 
 from scrapy.utils.log import configure_logging
 
-LOG_ENABLED = False
+LOG_ENABLED = True
 # Disable default Scrapy log settings.
-configure_logging(install_root_handler=False)
+configure_logging(install_root_handler=True)
 
 # Define your logging settings.
 log_file = '/root/virtual_env/catchpace-cafe-crawlers/jdscrapper/jdlogs.log'
 
 root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
+root_logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 rotating_file_log = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=1)
 rotating_file_log.setLevel(logging.INFO)

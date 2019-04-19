@@ -14,9 +14,8 @@ from scrapy.utils.response import response_status_message
 import pymongo
 import logging
 
-class UserAgentRotatorMiddleware(UserAgentMiddleware):
 
-    user_agents_list = [
+user_agents_list = [
     # Google Chrome
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13",
@@ -74,11 +73,13 @@ class UserAgentRotatorMiddleware(UserAgentMiddleware):
     "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
 ]
 
+class UserAgentRotatorMiddleware(UserAgentMiddleware):
+
     def __init__(self,user_agent=''):
         self.user_agent = user_agent
     def process_request(self, request, spider):
         try:  
-            self.user_agent = random.choice(self.user_agents_list)
+            self.user_agent = random.choice(user_agents_list)
             request.headers.setdefault('User-Agent',self.user_agent)
         except IndexError:
             logging.error('Error in getting user Agent')
@@ -91,10 +92,30 @@ class JDRetryMiddleware(RetryMiddleware):
             return response
         if response.status in self.retry_http_codes:
             reason = response_status_message(response.status)
+            proxy = request.meta['proxy']
+            logging.info(request.headers)
+            prev_user_agent = request.headers['User-Agent']
+            temp_user_agents_list = user_agents_list
+            logging.info("Redirection error")
+            prev_user_agent = prev_user_agent.decode("utf-8")
+            logging.info(prev_user_agent)
+            if prev_user_agent in temp_user_agents_list:
+                temp_user_agents_list.remove(prev_user_agent)     
+            user_agent = random.choice(temp_user_agents_list)
+            logging.info(user_agent)
+            request.headers['User-Agent'] = user_agent
+
+            request.meta['dont_redirect'] = True
+            request.meta['handle_httpstatus_list'] = [301,302]
+            logging.info(request.headers)
+            reason = 'meta'
+
             return self._retry(request, reason, spider) or response
         
         # continue
         if 'robots' not in request.url and len(response.xpath(spider.retry_xpath))==0:
+            logging.info("Request failed")
+            logging.info(response)
             return self._retry(request, 'response got xpath "{}"'.format(spider.retry_xpath), spider) or response
         
         return response

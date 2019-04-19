@@ -1,2 +1,2 @@
-rm -rf /root/virtual_env/catchpace-cafe-crawlers/jdscrapper/jddetaillogs.log
+rm -rf /root/virtual_env/catchpace-cafe-crawlers/jdscrapper/jdlogs.log
 scrapy crawl jddetail
