@@ -41,6 +41,10 @@ def fetchDocIds(value):
 
 class JDItem(scrapy.Item):
     # define the fields for your item here like:
+    city = scrapy.Field(
+        input_processor = MapCompose(str.strip),
+        output_processor = TakeFirst()
+    )
     name = scrapy.Field(
         input_processor = MapCompose(str.strip),
         output_processor = TakeFirst()
@@ -72,7 +76,10 @@ class JDItem(scrapy.Item):
         output_processor = TakeFirst()
     )
     
-    detailPgLnk = scrapy.Field()
+    detailPgLnk = scrapy.Field(
+        input_processor = MapCompose(str.strip),
+        output_processor = TakeFirst()
+    )
 
     docId = scrapy.Field(
         input_processor = MapCompose(str.strip,fetchDocIds),

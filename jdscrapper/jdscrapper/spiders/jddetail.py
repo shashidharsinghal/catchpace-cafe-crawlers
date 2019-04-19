@@ -11,7 +11,7 @@ class JDdetailSpider(scrapy.Spider):
     _jd_url_collection = 'jd_details_url'
     retry_xpath = "//div[@id='setbackfix']"
     #allowed_domains = ['justdial.com']
-    req_urls = []
+    city_req_urls = {}
     #custom_settings = {
     #    'FEED_URI':'/Users/mmt5571/Documents/personal/study/udemy/virtual_workspace/jdscrapper/detail/jddetail.json'
     #}
@@ -19,15 +19,17 @@ class JDdetailSpider(scrapy.Spider):
     @classmethod
     def from_crawler(self, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
-        self.req_urls = self.get_urls_from_mongo(self,crawler)
+        self.city_req_urls = self.get_urls_from_mongo(self,crawler)
         return spider
 
     def start_requests(self):
-        for url in self.req_urls:
-             yield Request(url,
+        for city_doc in self.city_req_urls:
+            url = city_doc["url"]
+            self.current_req_city = city_doc["city"]
+            yield Request(url,
                   meta = {
                       'dont_redirect': True,
-                      'handle_httpstatus_list': [302]
+                      'handle_httpstatus_list': [301,302]
                   },
                   callback= self.parse)
 
@@ -36,6 +38,8 @@ class JDdetailSpider(scrapy.Spider):
         openhours = []
         modesofpayment = []
         jditemloader = ItemLoader( item = JDItem(), selector=jdDetailSel, response=response)
+        #city Name
+        jditemloader.add_value('city',self.current_req_city)
         #Website Link
         jditemloader.add_xpath('website',"//div[contains(@class,'dtpage')]/div/div/ul/li/span/a[@rel='nofollow']/text()")
         #Average rating
@@ -79,13 +83,12 @@ class JDdetailSpider(scrapy.Spider):
 
     def get_urls_from_mongo(self,crawler):
         #Get Mongo connection
-        start_urls = []
+        statusDoc = []
         self.client = pymongo.MongoClient(crawler.settings.get('MONGO_URI'))
         self.db = self.client[crawler.settings.get('MONGO_DATABASE')]
         url_collection = crawler.settings.get('DETAIL_URL_STATUS_COL')
-        for url in self.db[url_collection].find({"status":False},{"url":1,"_id":0}):
-            start_urls.append(url["url"][0])
-#        logging.info(self.req_urls)
+        for doc in self.db[url_collection].find({"status":False},{"url":1,"city":1,"_id":0}):
+            statusDoc.append(doc)
         self.client.close()
-        return start_urls
+        return statusDoc
         

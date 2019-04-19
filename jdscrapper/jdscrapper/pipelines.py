@@ -44,15 +44,15 @@ class JDMongoPipeline:
 
     def process_jd_list(self,item):
         #Verify if the item is already present.
-        doc = self.db[self.jd_data_collection].find_one({"docId":item['docId']})
+        doc = self.db[self.jd_data_collection].find_one({"$and":[{"docId":item['docId']},{"city":item['city']}]})
         if  doc is None:
             #Save JD status doc in Mongo
-            statusdoc = {"url":item['detailPgLnk'],"status":False,"docId":item['docId']}
+            statusdoc = {"url":item['detailPgLnk'],"status":False,"docId":item['docId'],"city":item['city']}
             #Save JD detail page link in Mongo
             self.db[self.jd_data_url_collection].insert_one(statusdoc)
             jdDoc = dict(item)
             del jdDoc['detailPgLnk']
-            #Update jd doc in Mongo
+            #Update jd doc in Mongos
             self.db[self.jd_data_collection].insert_one(jdDoc)
         else:
             pass
@@ -62,10 +62,11 @@ class JDMongoPipeline:
             return item
         #Update jd Details in doc
         docId = item['docId']
-        oldDoc = self.db[self.jd_data_collection].find({"docId":docId})[0]
+        city = item['city']
+        oldDoc = self.db[self.jd_data_collection].find({"$and":[{"docId":docId},{"city":city}]})[0]
         newDoc = { "$set": dict(item) }
         self.db[self.jd_data_collection].update_one(oldDoc,newDoc)
-        statusdoc = self.db[self.jd_data_url_collection].find({"docId":docId})[0]
+        statusdoc = self.db[self.jd_data_url_collection].find({"$and":[{"docId":docId},{"city":city}]})[0]
         #Update status
         statusnewDoc = { "$set": {"status":True} }
         self.db[self.jd_data_url_collection].update_one(statusdoc,statusnewDoc)

@@ -14,19 +14,23 @@ class JDlistSpider(scrapy.Spider):
     #}
     #allowed_domains = ['justdial.com']
     firstelement = True
-    req_urls = []
-
+    current_req_city = ''
+    cities = []
+    city_url_mapping = {}
+    library_list_url = "https://www.justdial.com/{0}/Libraries/nct-10299414/page-1"
 
     @classmethod
     def from_crawler(self, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
-        spider.req_urls.append(crawler.settings.get('INIT_REQ_URL'))
+        self.cities = crawler.settings.get('LIST_CITIES')
         return spider
 
     def start_requests(self):
-        for url in self.req_urls:
-            logging.info(self.req_urls)
-            #self.executeRequest(url) 
+        for city in self.cities:
+            tmp_library_list_url = self.library_list_url
+            url = tmp_library_list_url.format(city)
+            self.current_req_city = city
+            logging.info("City: {0} - URL: {1}".format(city,url))
             yield Request(url,
                  meta = {
                      'dont_redirect': True,
@@ -38,6 +42,8 @@ class JDlistSpider(scrapy.Spider):
     def parse(self, response):
         for jd in response.selector.xpath("//li[@class='cntanr']"):
             loader = ItemLoader( item = JDItem(), selector = jd, response = response )
+            #City Name
+            loader.add_value('city',self.current_req_city)
             #Name of the jd
             loader.add_xpath('name',".//section/div/section[@class='jcar']/div/h2/span/a/span/text()[1]")
             #Address of the jd
