@@ -26,7 +26,7 @@ class JDdetailSpider(scrapy.Spider):
     def start_requests(self):
         for city_doc in self.city_req_urls:
             logging.info(city_doc)
-            url = city_doc["url"]
+            url = city_doc["detailPgLnk"]
             self.current_req_city = city_doc["city"]
             yield Request(url,
                   meta = {
@@ -40,6 +40,8 @@ class JDdetailSpider(scrapy.Spider):
         openhours = []
         modesofpayment = []
         jditemloader = ItemLoader( item = JDItem(), selector=jdDetailSel, response=response)
+        #status to True
+        jditemloader.add_value('status',True)
         #city Name
         jditemloader.add_value('city',self.current_req_city)
         #Website Link
@@ -93,8 +95,8 @@ class JDdetailSpider(scrapy.Spider):
         statusDoc = []
         self.client = pymongo.MongoClient(crawler.settings.get('MONGO_URI'))
         self.db = self.client[crawler.settings.get('MONGO_DATABASE')]
-        url_collection = crawler.settings.get('DETAIL_URL_STATUS_COL')
-        for doc in self.db[url_collection].find({"status":False},{"url":1,"city":1,"_id":0}):
+        url_collection = crawler.settings.get('DETAIL_DATA_COL')
+        for doc in self.db[url_collection].find({"status":False},{"detailPgLnk":1,"city":1,"_id":0}):
             statusDoc.append(doc)
         self.client.close()
         return statusDoc

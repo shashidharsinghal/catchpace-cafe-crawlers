@@ -14,7 +14,6 @@ class JDlistSpider(scrapy.Spider):
     #}
     #allowed_domains = ['justdial.com']
     firstelement = True
-    current_req_city = ''
     cities = []
     city_url_mapping = {}
     library_list_url = "https://www.justdial.com/{0}/Libraries/nct-10299414/page-1"
@@ -29,12 +28,13 @@ class JDlistSpider(scrapy.Spider):
         for city in self.cities:
             tmp_library_list_url = self.library_list_url
             url = tmp_library_list_url.format(city)
-            self.current_req_city = city
+            #self.current_req_city = city
             logging.info("City: {0} - URL: {1}".format(city,url))
             yield Request(url,
                  meta = {
                      'dont_redirect': True,
-                      'handle_httpstatus_list': [301,302]
+                      'handle_httpstatus_list': [301,302],
+                      'cty':city
                   },
                   callback= self.parse)
 
@@ -43,7 +43,9 @@ class JDlistSpider(scrapy.Spider):
         for jd in response.selector.xpath("//li[@class='cntanr']"):
             loader = ItemLoader( item = JDItem(), selector = jd, response = response )
             #City Name
-            loader.add_value('city',self.current_req_city)
+            city = response.meta['cty']
+            logging.info(city)
+            loader.add_value('city',city)
             #Name of the jd
             loader.add_xpath('name',".//section/div/section[@class='jcar']/div/h2/span/a/span/text()[1]")
             #Address of the jd
@@ -52,6 +54,8 @@ class JDlistSpider(scrapy.Spider):
             loader.add_xpath('detailPgLnk',".//span[@class='jcn']/a/@href")
             #Doc ID of jd as per JD
             loader.add_xpath('docId',".//span[@class='jcn']/a/@onclick")
+            #Status
+            loader.add_value('status',False)
             #PhoneNumber
             phone_number_xpath_1 = ".//section/div/section[@class='jcar']/div/p/span/a/b/span[@class]/@class"
             phone_number_xpath_2 = ".//section/div/section[@class='jcar']/div/p/span/a/span[contains(@class,'mobilesv')]/@class"
@@ -75,6 +79,7 @@ class JDlistSpider(scrapy.Spider):
             yield scrapy.Request(url=next_page_link,
                   meta = {
                       'dont_redirect': True,
-                      'handle_httpstatus_list': [301,302]
+                      'handle_httpstatus_list': [301,302],
+                      'cty':city
                     },
                     callback=self.parse)

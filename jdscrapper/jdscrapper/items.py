@@ -92,3 +92,7 @@ class JDItem(scrapy.Item):
         input_processor = MapCompose(str.strip),
         output_processor = TakeFirst()
     )
+
+    status = scrapy.Field(
+        output_processor = TakeFirst()
+    )

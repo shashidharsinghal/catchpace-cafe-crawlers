@@ -66,7 +66,7 @@ AUTOTHROTTLE_ENABLED = True
 
 #Mongo settings
 MONGO_URI="mongodb+srv://catchpace:O01e2imlupSb8FQF@catchpace-db-mggdr.mongodb.net"
-MONGO_DATABASE="jddatacty"
+MONGO_DATABASE="jddata"
 JD_ERROR_URL_COL="error_url"
 
 #Cafe settings
@@ -78,7 +78,7 @@ JD_ERROR_URL_COL="error_url"
 #Library settings
 INIT_REQ_URL="https://www.justdial.com/Delhi/Libraries-in-Gurgaon/page-49"
 DETAIL_DATA_COL="jd_details_lib"
-DETAIL_URL_STATUS_COL="jd_details_url_lib"
+#DETAIL_URL_STATUS_COL="jd_details_url_lib"
 
 #Setting up logging properties
 import logging
