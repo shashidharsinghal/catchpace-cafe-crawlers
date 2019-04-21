@@ -93,15 +93,15 @@ class JDRetryMiddleware(RetryMiddleware):
         if response.status in self.retry_http_codes:
             reason = response_status_message(response.status)
             proxy = request.meta['proxy']
-            logging.info(request.headers)
+            #logging.info(request.headers)
             prev_user_agent = request.headers['User-Agent']
-            temp_user_agents_list = user_agents_list
+            #temp_user_agents_list = user_agents_list
             logging.info("Redirection error")
             prev_user_agent = prev_user_agent.decode("utf-8")
             logging.info(prev_user_agent)
-            if prev_user_agent in temp_user_agents_list:
-                temp_user_agents_list.remove(prev_user_agent)     
-            user_agent = random.choice(temp_user_agents_list)
+            #if prev_user_agent in temp_user_agents_list:
+            #    temp_user_agents_list.remove(prev_user_agent)     
+            user_agent = random.choice(user_agents_list)
             logging.info(user_agent)
             request.headers['User-Agent'] = user_agent
 

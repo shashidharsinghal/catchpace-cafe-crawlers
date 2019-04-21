@@ -10,6 +10,7 @@ class JDdetailSpider(scrapy.Spider):
     name = 'jddetail'
     _jd_url_collection = 'jd_details_url'
     retry_xpath = "//div[@id='setbackfix']"
+    current_req_city = ''
     #allowed_domains = ['justdial.com']
     city_req_urls = {}
     #custom_settings = {
@@ -24,6 +25,7 @@ class JDdetailSpider(scrapy.Spider):
 
     def start_requests(self):
         for city_doc in self.city_req_urls:
+            logging.info(city_doc)
             url = city_doc["url"]
             self.current_req_city = city_doc["city"]
             yield Request(url,
@@ -47,7 +49,12 @@ class JDdetailSpider(scrapy.Spider):
         #Total Reviews
         jditemloader.add_xpath('totreviews',"//div[@class='company-details']/div/div/div/span/span/span[@class='votes']/text()")
         #doc Id of jd as per JD
-        jditemloader.add_xpath('docId',"//form/input[@id='docid']/@value[1]")
+        docIdXpath = ".//form/input[@id='docid']/@value[1]"
+        logging.info(jdDetailSel.xpath(docIdXpath).extract())
+        if jdDetailSel.xpath(docIdXpath).extract_first() is None:
+            docIdXpath = ".//input[@id='docid']/@value[1]" 
+            logging.info(jdDetailSel.xpath(docIdXpath).extract())
+        jditemloader.add_xpath('docId',docIdXpath)
         #Opening hours of jd
         openhours = self.parse_openhours(response)
         jditemloader.add_value('openhours',openhours)

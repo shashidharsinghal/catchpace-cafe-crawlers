@@ -10,7 +10,6 @@
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'jdscrapper'
-
 SPIDER_MODULES = ['jdscrapper.spiders']
 NEWSPIDER_MODULE = 'jdscrapper.spiders'
 
@@ -21,7 +20,7 @@ ROBOTSTXT_OBEY = False
 CONCURRENT_REQUESTS = 1
 RETRY_HTTP_CODES = [301,302]
 
-DOWNLOAD_DELAY = 2
+DOWNLOAD_DELAY = 1
 RETRY_TIMES = 50
 ROTATING_PROXY_PAGE_RETRY_TIMES = 50
 # The download delay setting will honor only one of:
@@ -53,6 +52,9 @@ LIST_CITIES = ['Delhi','Gurgaon','Bangalore','Mumbai','Chennai','Dehradun','Noid
     'Jaipur','Ahemdabad','Hyderabad','Surat','Kolkata','Kota','Lucknow','Indore','Bhopal','Chittoor','Nagpur','Chandigarh',
     'Guwahati'
 ]
+
+
+#LIST_CITIES = ['Nagpur','Chitoor','Chandigarh','Guwahati']
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
